@@ -96,6 +96,15 @@ function numberText(value) {
   return Number(value || 0).toLocaleString("zh-TW", { maximumFractionDigits: 3 });
 }
 
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+}
+
 function setTab(tab) {
   $$(".tab").forEach((btn) => btn.classList.toggle("active", btn.dataset.tab === tab));
   $$(".panel").forEach((panel) => panel.classList.add("hidden"));
@@ -136,12 +145,12 @@ function renderPurchaseRows() {
   const rows = state.purchases.filter((row) => !keyword || row.item_spec.toLowerCase().includes(keyword));
   $("#purchaseGrid tbody").innerHTML = rows.map((row) => `
     <tr data-id="${row.id}" class="${state.selectedPurchase?.id === row.id ? "selected" : ""}">
-      <td title="${row.item_spec}">${row.item_spec}</td>
-      <td>${row.order_date}</td>
-      <td>${row.expected_month}</td>
+      <td title="${escapeHtml(row.item_spec)}">${escapeHtml(row.item_spec)}</td>
+      <td>${escapeHtml(row.order_date)}</td>
+      <td>${escapeHtml(row.expected_month)}</td>
       <td class="num">${numberText(row.requisition_qty)}</td>
       <td class="num">${numberText(row.purchase_qty)}</td>
-      <td>${row.unit}</td>
+      <td>${escapeHtml(row.unit)}</td>
       <td class="num">${numberText(row.receipt_qty)}</td>
       <td class="num">${numberText(row.sold_qty)}</td>
       <td class="num">${numberText(row.balance_qty)}</td>
@@ -227,10 +236,10 @@ async function deletePurchase() {
 function renderPurchaseDetails() {
   $("#purchaseDetailGrid tbody").innerHTML = state.purchaseDetails.map((row) => `
     <tr data-id="${row.id}" class="${state.selectedPurchaseDetail?.id === row.id ? "selected" : ""}">
-      <td>${row.purchase_date}</td>
+      <td>${escapeHtml(row.purchase_date)}</td>
       <td class="num">${numberText(row.purchase_qty)}</td>
-      <td>${row.vendor}</td>
-      <td>${row.updated_at}</td>
+      <td>${escapeHtml(row.vendor)}</td>
+      <td>${escapeHtml(row.updated_at)}</td>
     </tr>
   `).join("");
 }
@@ -292,7 +301,7 @@ function renderDetails(kind, rows) {
   const qtyKey = kind === "receipt" ? "receipt_qty" : "sold_qty";
   grid.querySelector("tbody").innerHTML = rows.map((row) => `
     <tr data-id="${row.id}" class="${selected?.id === row.id ? "selected" : ""}">
-      <td>${row[dateKey]}</td><td class="num">${numberText(row[qtyKey])}</td><td>${row.updated_at}</td>
+      <td>${escapeHtml(row[dateKey])}</td><td class="num">${numberText(row[qtyKey])}</td><td>${escapeHtml(row.updated_at)}</td>
     </tr>
   `).join("");
 }
@@ -393,8 +402,8 @@ async function deleteSales() {
 
 function renderUsers() {
   $("#userGrid tbody").innerHTML = state.users.map((row) => `
-    <tr data-username="${row.username}" class="${state.selectedUser?.username === row.username ? "selected" : ""}">
-      <td>${row.username}</td><td>${row.employee_name}</td><td>${roleLabels[row.role]}</td><td>${row.updated_at}</td>
+    <tr data-username="${escapeHtml(row.username)}" class="${state.selectedUser?.username === row.username ? "selected" : ""}">
+      <td>${escapeHtml(row.username)}</td><td>${escapeHtml(row.employee_name)}</td><td>${escapeHtml(roleLabels[row.role])}</td><td>${escapeHtml(row.updated_at)}</td>
     </tr>
   `).join("");
 }
