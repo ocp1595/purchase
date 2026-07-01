@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>請採入銷系統</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <section id="loginView" class="login-view">
+    <form id="loginForm" class="login-box">
+      <h1>請採入銷系統</h1>
+      <label>帳號<input name="username" autocomplete="username" required></label>
+      <label>密碼<input name="password" type="password" autocomplete="current-password" required></label>
+      <button type="submit">登入</button>
+      <div id="loginMsg" class="msg"></div>
+    </form>
+  </section>
+
+  <main id="appView" class="app hidden">
+    <header class="topbar">
+      <div>
+        <strong>請採入銷系統</strong>
+        <span id="userInfo"></span>
+      </div>
+      <nav>
+        <button data-tab="purchases" class="tab active">請購主檔</button>
+        <button data-tab="purchaseDetails" class="tab">採購明細</button>
+        <button data-tab="receipts" class="tab">入庫明細</button>
+        <button data-tab="sales" class="tab">接單明細</button>
+        <button data-tab="users" class="tab admin-only">員工帳密</button>
+        <button id="logoutBtn" class="ghost">登出</button>
+      </nav>
+    </header>
+
+    <section class="workspace">
+      <section class="content">
+        <section id="purchasesPanel" class="panel">
+          <div class="section-title with-actions">
+            <span>請購主檔</span>
+            <span class="panel-actions">
+              <input id="searchText" class="title-search" placeholder="搜尋品名規格">
+              <button id="reloadBtn" type="button">查詢</button>
+              <button type="button" id="newPurchaseBtn">新增</button>
+              <button type="button" id="editPurchaseBtn">修改</button>
+              <button type="button" id="deletePurchaseBtn" class="danger">刪除</button>
+            </span>
+          </div>
+          <table class="grid" id="purchaseGrid">
+            <thead>
+              <tr>
+                <th>品名規格</th><th>日期</th><th>預計年月</th><th>請購數量</th><th>採購數量</th><th>單位</th><th>入庫數量</th><th>已接單量</th><th>餘量</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </section>
+
+        <section id="purchaseDetailsPanel" class="panel hidden">
+          <div class="section-title with-actions">
+            <span>採購明細 <span id="purchaseDetailHeader"></span></span>
+            <span class="panel-actions">
+              <button type="button" id="newPurchaseDetailBtn">新增</button>
+              <button type="button" id="editPurchaseDetailBtn">修改</button>
+              <button type="button" id="deletePurchaseDetailBtn" class="danger">刪除</button>
+            </span>
+          </div>
+          <table class="grid" id="purchaseDetailGrid">
+            <thead><tr><th>日期</th><th>採購數量</th><th>廠商</th><th>更新時間</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </section>
+
+        <section id="receiptsPanel" class="panel hidden">
+          <div class="section-title with-actions">
+            <span>入庫明細 <span id="receiptHeader"></span></span>
+            <span class="panel-actions">
+              <button type="button" id="newReceiptBtn">新增</button>
+              <button type="button" id="editReceiptBtn">修改</button>
+              <button type="button" id="deleteReceiptBtn" class="danger">刪除</button>
+            </span>
+          </div>
+          <table class="grid" id="receiptGrid">
+            <thead><tr><th>日期</th><th>入庫數量</th><th>更新時間</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </section>
+
+        <section id="salesPanel" class="panel hidden">
+          <div class="section-title with-actions">
+            <span>接單明細 <span id="salesHeader"></span></span>
+            <span class="panel-actions">
+              <button type="button" id="newSalesBtn">新增</button>
+              <button type="button" id="editSalesBtn">修改</button>
+              <button type="button" id="deleteSalesBtn" class="danger">刪除</button>
+            </span>
+          </div>
+          <table class="grid" id="salesGrid">
+            <thead><tr><th>日期</th><th>接單數量</th><th>更新時間</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </section>
+
+        <section id="usersPanel" class="panel hidden">
+          <div class="section-title with-actions">
+            <span>員工帳密</span>
+            <span class="panel-actions">
+              <button type="button" id="newUserBtn">新增</button>
+              <button type="button" id="editUserBtn">修改</button>
+              <button type="button" id="deleteUserBtn" class="danger">刪除</button>
+            </span>
+          </div>
+          <table class="grid" id="userGrid">
+            <thead><tr><th>帳號</th><th>姓名</th><th>權限</th><th>更新時間</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </section>
+      </section>
+    </section>
+    <div id="toast" class="toast hidden"></div>
+  </main>
+
+  <dialog id="purchaseDialog" class="edit-dialog">
+    <form id="purchaseForm" class="dialog-form">
+      <input name="id" type="hidden">
+      <div class="dialog-title">請購主檔表單</div>
+      <label>品名規格<input name="item_spec" required></label>
+      <label>日期<input name="order_date" placeholder="yyyy/mm/dd" required></label>
+      <label>預計入庫年月<input name="expected_month" placeholder="yyyy/mm" required></label>
+      <label>請購數量<input name="requisition_qty" class="qty-input" required></label>
+      <label>單位<input name="unit" value="KG" required></label>
+      <div class="dialog-actions">
+        <button type="submit">儲存</button>
+        <button type="button" class="close-dialog">取消</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="purchaseDetailDialog" class="edit-dialog narrow">
+    <form id="purchaseDetailForm" class="dialog-form">
+      <input name="id" type="hidden">
+      <div class="dialog-title">採購明細表單</div>
+      <label>日期<input name="purchase_date" placeholder="yyyy/mm/dd" required></label>
+      <label>採購數量<input name="purchase_qty" class="qty-input" required></label>
+      <label>廠商<input name="vendor" required></label>
+      <div class="dialog-actions">
+        <button type="submit">儲存</button>
+        <button type="button" class="close-dialog">取消</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="receiptDialog" class="edit-dialog narrow">
+    <form id="receiptForm" class="dialog-form">
+      <input name="id" type="hidden">
+      <div class="dialog-title">入庫明細表單</div>
+      <label>日期<input name="receipt_date" placeholder="yyyy/mm/dd" required></label>
+      <label>入庫數量<input name="receipt_qty" class="qty-input" required></label>
+      <div class="dialog-actions">
+        <button type="submit">儲存</button>
+        <button type="button" class="close-dialog">取消</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="salesDialog" class="edit-dialog narrow">
+    <form id="salesForm" class="dialog-form">
+      <input name="id" type="hidden">
+      <div class="dialog-title">接單明細表單</div>
+      <label>日期<input name="sales_date" placeholder="yyyy/mm/dd" required></label>
+      <label>接單數量<input name="sold_qty" class="qty-input" required></label>
+      <div class="dialog-actions">
+        <button type="submit">儲存</button>
+        <button type="button" class="close-dialog">取消</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="userDialog" class="edit-dialog">
+    <form id="userForm" class="dialog-form">
+      <div class="dialog-title">員工帳密表單</div>
+      <label>登入帳號<input name="username" required></label>
+      <label>員工姓名<input name="employee_name" required></label>
+      <label>密碼<input name="password" type="password" required></label>
+      <label>權限
+        <select name="role" required>
+          <option value="admin">系統管理者</option>
+          <option value="sales">管銷</option>
+          <option value="purchase">採購</option>
+          <option value="warehouse">儲運</option>
+        </select>
+      </label>
+      <div class="dialog-actions">
+        <button type="submit">儲存</button>
+        <button type="button" class="close-dialog">取消</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="./config.js"></script>
+  <script src="./app.js"></script>
+</body>
+</html>
